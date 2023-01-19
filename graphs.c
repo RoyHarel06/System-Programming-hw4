@@ -291,7 +291,7 @@ int main() {
                 first = false;
             else
                 printf("\n");
-            printf("Dijsktra shortest path: %d ", ret);
+            printf("Dijsktra shortest path: %d", ret);
         }
         else if (input == 'T') {
             int ret = shortestPathMidpoints(graph);
@@ -300,7 +300,7 @@ int main() {
                 first = false;
             else
                 printf("\n");
-            printf("TSP shortest path: %d ", ret);
+            printf("TSP shortest path: %d", ret);
         }
         else
             break;
