@@ -60,6 +60,8 @@ void addIntersection(Graph* graph) {
 
         scanf("%d", &input);
         *(new->edge_weight + i) = input;
+
+        i++;
     }
 
     graph->intersections = realloc(graph->intersections, (graph->intersection_count+1)*sizeof(Intersection));
@@ -77,25 +79,6 @@ void addEmptyIntersection(Graph* graph, int name) {
     graph->intersections = realloc(graph->intersections, (graph->intersection_count+1)*sizeof(Intersection));
     *(graph->intersections + graph->intersection_count) = new;
     graph->intersection_count++;
-}
-
-Graph* initGraph() {
-    Graph* graph = malloc(sizeof(Graph));
-
-    int intersection_count;
-    scanf("%d", &intersection_count);
-
-    char input;
-    while (scanf("%c", &input) != 0 && input == 'n') {
-        addIntersection(graph);
-    }
-
-    for (int i = 0; i < intersection_count; i++) {
-        if (getIntersection(graph, i) == NULL)
-            addEmptyIntersection(graph, i);
-    }
-    
-    return graph;
 }
 
 void deleteEdgesToIntersection(Intersection intersection, int intersection_name) {
@@ -267,9 +250,30 @@ int main() {
 
     while (scanf("%c", &input) != 0) {
         if (input == 'A') {
-            graph = initGraph();
+            graph = malloc(sizeof(Graph));
+            graph->intersection_count = 0;
+            graph->intersections = malloc(0);
+
+            int intersection_count;
+            scanf("%d", &intersection_count);
+
+            while (scanf("%c", &input) != 0) {
+                if (input == 'n') {
+                    printf("Added!\n");
+                    addIntersection(graph);
+                }
+                else
+                    break;
+            }
+
+            for (int i = 0; i < intersection_count; i++) {
+                if (getIntersection(graph, i) == NULL) {
+                    printf("Added!\n");
+                    addEmptyIntersection(graph, i);
+                }
+            }
         }
-        else if (input == 'B') {
+        if (input == 'B') {
             addIntersection(graph);
         }
         else if (input == 'D') {
@@ -286,6 +290,8 @@ int main() {
             int ret = shortestPathMidpoints(graph);
             printf("%d\n", ret);
         }
+        else
+            break;
     }
 
     return 0;
