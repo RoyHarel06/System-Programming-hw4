@@ -105,19 +105,20 @@ void deleteEdgesToIntersection(Intersection intersection, int intersection_name)
         }
     }
 
-    intersection->edge_count--;
-    intersection->edge_destination = realloc(intersection->edge_destination, intersection->edge_count*sizeof(int));
-    intersection->edge_weight = realloc(intersection->edge_weight, intersection->edge_count*sizeof(int));
+    if (deleted) {
+        intersection->edge_count--;
+        intersection->edge_destination = realloc(intersection->edge_destination, intersection->edge_count*sizeof(int));
+        intersection->edge_weight = realloc(intersection->edge_weight, intersection->edge_count*sizeof(int));
+    }
 }
 
-void deleteIntersection(Graph* graph) {
-    int intersection_name;
-    scanf("%d", &intersection_name);
-
+void deleteIntersection_(Graph* graph, int intersection_name) {
     bool deleted = false;
     for (int i = 0; i < graph->intersection_count; i++) {
         Intersection current = *(graph->intersections + i);
         if (current->name == intersection_name) {
+            free(current->edge_destination);
+            free(current->edge_weight);
             free(current);
             deleted = true;
         }
@@ -132,6 +133,11 @@ void deleteIntersection(Graph* graph) {
 
     graph->intersection_count--;
     graph->intersections = realloc(graph->intersections, graph->intersection_count*sizeof(Intersection));
+}
+void deleteIntersection(Graph* graph) {
+    int intersection_name;
+    scanf("%d", &intersection_name);
+    deleteIntersection_(graph, intersection_name);
 }
 
 int minDistance(unsigned int* shortest_distances, bool* handled, int length)
@@ -190,7 +196,10 @@ int shortestRoute(Graph* graph, int start, int end)
         }
     }
 
-    return *(shortest_distances+getIntersectionIndex(graph, end));
+    int ret = *(shortest_distances+getIntersectionIndex(graph, end));
+    free(shortest_distances);
+    free(handled);
+    return ret;
 }
 
 void swap(int* path, int a, int b)
@@ -248,6 +257,8 @@ int shortestPathMidpoints(Graph* graph) {
         unsigned int temp = checkAllPermutations(graph, path, 0, number_of_stops-1);
         if (temp < min)
             min = temp;
+
+        free(path);
         return min;
     }
     else {
@@ -256,6 +267,8 @@ int shortestPathMidpoints(Graph* graph) {
         unsigned int temp = shortestRoute(graph, *(path+0), *(path+1));
         if (temp < min)
             min = temp;
+
+        free(path);
         return min;
     }
 
@@ -322,6 +335,12 @@ int main() {
 
         input = 'f';
     }
+
+    while (graph->intersection_count != 0)
+    {
+        deleteIntersection_(graph, getIntersectionByIndex(graph, 0)->name);
+    }
+    free(graph);
 
     return 0;
 }
