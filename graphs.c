@@ -139,7 +139,7 @@ void deleteIntersection(Graph* graph) {
     graph->intersections = realloc(graph->intersections, graph->intersection_count*sizeof(Intersection));
 }
 
-int minDistance(int* shortest_distances, bool* handled, int length)
+int minDistance(unsigned int* shortest_distances, bool* handled, int length)
 {
     unsigned int min = -1;
     unsigned int min_index = -1;
@@ -201,7 +201,7 @@ int shortestRoute(Graph* graph, int start, int end)
     return *(shortest_distances+getIntersectionIndex(graph, end));
 }
 
-inline void swap(int* path, int a, int b)
+void swap(int* path, int a, int b)
 {
   int temp = *(path+a);
   *(path+a) = *(path+b);
@@ -224,19 +224,21 @@ int checkAllPermutations(Graph* graph, int path_start, int* path, int start_i, i
         return length;
     }
 
-    int min = permute(graph, path_start, path, start_i + 1, end_i); /* start at next element */
+    int min = checkAllPermutations(graph, path_start, path, start_i + 1, end_i); /* start at next element */
 
     /* permute remaining elements recursively */
     for(int i = start_i + 1; i < end_i; i++) 
     {
-        if( *(path+start_i) == *(path+i) )
+        if( *(path+start_i) == *(path+i) ) {
             continue;
+        }
  
 	    swap(path, start_i, i);
 	
-	    int temp = permute(graph, path_start, path, start_i + 1, end_i);
-        if (temp < min)
+	    int temp = checkAllPermutations(graph, path_start, path, start_i + 1, end_i);
+        if (temp < min) {
             min = temp;
+        }
 
 	    swap(path, start_i, i); /* restore element order */ 
     }
@@ -259,7 +261,7 @@ int shortestPathMidpoints(Graph* graph) {
     return checkAllPermutations(graph, start, path, 0, number_of_stops-2);
 }
 
-void main() {
+int main() {
     Graph* graph;
     char input;
 
@@ -285,4 +287,6 @@ void main() {
             printf("%d\n", ret);
         }
     }
+
+    return 0;
 }
