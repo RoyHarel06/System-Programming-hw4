@@ -184,9 +184,6 @@ int shortestRoute(Graph* graph, int start, int end)
 
             bool is_shorter = *(shortest_distances+current_index) + edge_weight < *(shortest_distances+j);
             
-            // there is an edge from u to v, and total
-            // weight of path from src to  v through u is
-            // smaller than current value of dist[v]
             if (is_handled && is_possible && is_there_edge && is_shorter) {
                 *(shortest_distances+j) = *(shortest_distances+current_index) + edge_weight;
             }
@@ -216,19 +213,19 @@ int checkAllPermutations(Graph* graph, int* path, int start_i, int end_i)
         return length;
     }
 
-    int min = checkAllPermutations(graph, path, start_i + 1, end_i); /* start at next element */
+    unsigned int min = checkAllPermutations(graph, path, start_i + 1, end_i); /* start at next element */
 
     /* permute remaining elements recursively */
-    for(int i = start_i + 1; i < end_i; i++) 
+    for(int i = start_i; i < end_i; i++) 
     {
-	    swap(path, start_i, i);
+	    swap(path, start_i, i+1);
 	
-	    int temp = checkAllPermutations(graph, path, start_i + 1, end_i);
+	    unsigned int temp = checkAllPermutations(graph, path, start_i + 1, end_i);
         if (temp < min) {
             min = temp;
         }
 
-	    swap(path, start_i, i); /* restore element order */ 
+	    swap(path, start_i, i+1); /* restore element order */ 
     }
 
     return min;
@@ -245,8 +242,14 @@ int shortestPathMidpoints(Graph* graph) {
         *(path+i) = temp;
     }
     
-    if (number_of_stops > 2)
-        return checkAllPermutations(graph, path, 0, number_of_stops-1);
+    if (number_of_stops > 2) {
+        unsigned int min = checkAllPermutations(graph, path, 0, number_of_stops-1);
+        swap(path, 0, number_of_stops-1);
+        unsigned int temp = checkAllPermutations(graph, path, 0, number_of_stops-1);
+        if (temp < min)
+            min = temp;
+        return min;
+    }
     else {
         unsigned int min = shortestRoute(graph, *(path+0), *(path+1));
         swap(path, 0, 1);
