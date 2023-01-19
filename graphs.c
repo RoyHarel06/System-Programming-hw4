@@ -39,7 +39,7 @@ Intersection getIntersectionByIndex(Graph* graph, int index) {
 }
 
 void addIntersection(Graph* graph) {
-    Intersection new = malloc(sizeof(Intersection));
+    Intersection new = malloc(sizeof(struct Intersection_t));
 
     int input;
     scanf("%d", &input);
@@ -142,8 +142,8 @@ int minDistance(unsigned int* shortest_distances, bool* handled, int length)
 */
 int shortestRoute(Graph* graph, int start, int end)
 {
-    unsigned int* shortest_distances = malloc(graph->intersection_count);
-    bool* handled = malloc(graph->intersection_count);
+    unsigned int* shortest_distances = malloc(graph->intersection_count*sizeof(int));
+    bool* handled = malloc(graph->intersection_count*sizeof(int));
 
     for (int i = 0; i < graph->intersection_count; i++) {
         *(shortest_distances+i) = -1;
@@ -235,10 +235,12 @@ int shortestPathMidpoints(Graph* graph) {
     int start;
     scanf("%d", &start);
 
-    int* path = malloc(number_of_stops-1);
+    int* path = malloc((number_of_stops-1)*sizeof(int));
     for (int i = 0; i < number_of_stops-1; i++)
     {
-        scanf("%d", path+i);
+    	int temp;
+        scanf("%d", &temp);
+        *(path+i) = temp;
     }
     
     return checkAllPermutations(graph, start, path, 0, number_of_stops-2);
