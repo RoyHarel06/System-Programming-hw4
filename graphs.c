@@ -39,10 +39,20 @@ Intersection getIntersectionByIndex(Graph* graph, int index) {
 }
 
 void addIntersection(Graph* graph) {
-    Intersection new = malloc(sizeof(struct Intersection_t));
-
     int input;
     scanf("%d", &input);
+
+    Intersection new = getIntersection(graph, input);
+    bool is_new = false;
+    if (new == NULL) {
+        new = malloc(sizeof(struct Intersection_t));
+        is_new = true;
+    }
+    else {
+        free(new->edge_destination);
+        free(new->edge_weight);
+    }
+
     new->name = input;
 
     new->edge_count = 0;
@@ -64,9 +74,11 @@ void addIntersection(Graph* graph) {
         i++;
     }
 
-    graph->intersections = realloc(graph->intersections, (graph->intersection_count+1)*sizeof(Intersection));
-    *(graph->intersections + graph->intersection_count) = new;
-    graph->intersection_count++;
+    if (is_new) {
+        graph->intersections = realloc(graph->intersections, (graph->intersection_count+1)*sizeof(Intersection));
+        *(graph->intersections + graph->intersection_count) = new;
+        graph->intersection_count++;
+    }
 }
 void addEmptyIntersection(Graph* graph, int name) {
     Intersection new = malloc(sizeof(Intersection));
@@ -190,14 +202,11 @@ void swap(int* path, int a, int b)
   *(path+a) = *(path+b);
   *(path+b) = temp;
 }
-int checkAllPermutations(Graph* graph, int path_start, int* path, int start_i, int end_i)
+int checkAllPermutations(Graph* graph, int* path, int start_i, int end_i)
 {
     if(start_i == end_i) /* checking a possible permutation */
     {
-        if (shortestRoute(graph, path_start, *(path+0)) == -1)
-            return -1;
-        int length = shortestRoute(graph, path_start, *(path+0));
-
+        int length = 0;
         for (int i = 0; i < end_i; i++)
         {
             if (shortestRoute(graph, *(path+i), *(path+i+1)) == -1)
@@ -207,18 +216,14 @@ int checkAllPermutations(Graph* graph, int path_start, int* path, int start_i, i
         return length;
     }
 
-    int min = checkAllPermutations(graph, path_start, path, start_i + 1, end_i); /* start at next element */
+    int min = checkAllPermutations(graph, path, start_i + 1, end_i); /* start at next element */
 
     /* permute remaining elements recursively */
     for(int i = start_i + 1; i < end_i; i++) 
     {
-        if( *(path+start_i) == *(path+i) ) {
-            continue;
-        }
- 
 	    swap(path, start_i, i);
 	
-	    int temp = checkAllPermutations(graph, path_start, path, start_i + 1, end_i);
+	    int temp = checkAllPermutations(graph, path, start_i + 1, end_i);
         if (temp < min) {
             min = temp;
         }
@@ -232,18 +237,25 @@ int shortestPathMidpoints(Graph* graph) {
     int number_of_stops;
     scanf("%d", &number_of_stops);
 
-    int start;
-    scanf("%d", &start);
-
-    int* path = malloc((number_of_stops-1)*sizeof(int));
-    for (int i = 0; i < number_of_stops-1; i++)
+    int* path = malloc((number_of_stops)*sizeof(int));
+    for (int i = 0; i < number_of_stops; i++)
     {
     	int temp;
         scanf("%d", &temp);
         *(path+i) = temp;
     }
     
-    return checkAllPermutations(graph, start, path, 0, number_of_stops-2);
+    if (number_of_stops > 2)
+        return checkAllPermutations(graph, path, 0, number_of_stops-1);
+    else {
+        unsigned int min = shortestRoute(graph, *(path+0), *(path+1));
+        swap(path, 0, 1);
+        unsigned int temp = shortestRoute(graph, *(path+0), *(path+1));
+        if (temp < min)
+            min = temp;
+        return min;
+    }
+
 }
 
 int main() {
