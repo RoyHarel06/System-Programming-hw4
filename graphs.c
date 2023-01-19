@@ -259,7 +259,6 @@ int main() {
 
             while (scanf("%c", &input) != 0) {
                 if (input == 'n') {
-                    printf("Added!\n");
                     addIntersection(graph);
                 }
                 else
@@ -268,7 +267,6 @@ int main() {
 
             for (int i = 0; i < intersection_count; i++) {
                 if (getIntersection(graph, i) == NULL) {
-                    printf("Added!\n");
                     addEmptyIntersection(graph, i);
                 }
             }
@@ -284,11 +282,11 @@ int main() {
             scanf("%d", &start);
             scanf("%d", &end);
             int ret = shortestRoute(graph, start, end);
-            printf("%d\n", ret);
+            printf("Dijsktra shortest path: %d\n", ret);
         }
         else if (input == 'T') {
             int ret = shortestPathMidpoints(graph);
-            printf("%d\n", ret);
+            printf("TSP shortest path: %d\n", ret);
         }
         else
             break;
