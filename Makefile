@@ -8,4 +8,4 @@ graph: graphs.c
 .PHONY: clean valgrind
 	
 clean:
-	rm -f *.o *.a *.so isort txtfind
+	rm -f *.o *.a *.so graph
