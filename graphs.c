@@ -250,7 +250,7 @@ int main() {
 
     bool first = true;
 
-    while (scanf("%c", &input) != 0) {
+    while (scanf(" %c", &input) != 0) {
         if (input == 'A') {
             graph = malloc(sizeof(Graph));
             graph->intersection_count = 0;
@@ -259,7 +259,7 @@ int main() {
             int intersection_count;
             scanf("%d", &intersection_count);
 
-            while (scanf("%c", &input) != 0) {
+            while (scanf(" %c", &input) != 0) {
                 if (input == 'n') {
                     addIntersection(graph);
                 }
