@@ -24,6 +24,19 @@ Intersection getIntersection(Graph* graph, int intersection_name) {
     
     return NULL;
 }
+int getIntersectionIndex(Graph* graph, int name) {
+    for (size_t i = 0; i < graph->intersection_count; i++) {
+        Intersection current = *(graph->intersections + i);
+
+        if (current->name == name)
+            return i;
+    }
+    
+    return -1;
+}
+Intersection getIntersectionByIndex(Graph* graph, int index) {
+    return *(graph->intersections + index);
+}
 
 void addIntersection(Graph* graph) {
     Intersection new = malloc(sizeof(Intersection));
@@ -66,8 +79,11 @@ void addEmptyIntersection(Graph* graph, int name) {
     graph->intersection_count++;
 }
 
-Graph* initGraph(int intersection_count) {
+Graph* initGraph() {
     Graph* graph = malloc(sizeof(Graph));
+
+    int intersection_count;
+    scanf("%d", &intersection_count);
 
     char input;
     while (scanf("%c", &input) != 0 && input == 'n') {
@@ -99,7 +115,10 @@ void deleteEdgesToIntersection(Intersection intersection, int intersection_name)
     intersection->edge_weight = realloc(intersection->edge_weight, intersection->edge_count*sizeof(int));
 }
 
-void deleteIntersection(Graph* graph, int intersection_name) {
+void deleteIntersection(Graph* graph) {
+    int intersection_name;
+    scanf("%d", &intersection_name);
+
     bool deleted = false;
     for (int i = 0; i < graph->intersection_count; i++) {
         Intersection current = *(graph->intersections + i);
@@ -120,8 +139,66 @@ void deleteIntersection(Graph* graph, int intersection_name) {
     graph->intersections = realloc(graph->intersections, graph->intersection_count*sizeof(Intersection));
 }
 
-int shortestRoute(Graph* graph, int start, int end) {
-    // ...
+int minDistance(int* shortest_distances, bool* handled, int length)
+{
+    unsigned int min = -1;
+    unsigned int min_index = -1;
+
+    for (int i = 0; i < length; i++) {
+        if (*(handled+i) == false && *(shortest_distances+i) <= min) {
+            min = *(shortest_distances+i);
+            min_index = i;
+        }
+    }
+
+    return (int) min_index;
+}
+
+/**
+ * Implements Dijkstra's Algorithm.
+*/
+int shortestRoute(Graph* graph, int start, int end)
+{
+    unsigned int* shortest_distances = malloc(graph->intersection_count);
+    bool* handled = malloc(graph->intersection_count);
+
+    for (int i = 0; i < graph->intersection_count; i++) {
+        *(shortest_distances+i) = -1;
+        *(handled+i) = false;
+    }
+
+    *(shortest_distances+getIntersectionIndex(graph, start)) = 0;
+
+    for (int i = 0; i < graph->intersection_count - 1; i++) {
+        int current_index = minDistance(shortest_distances, handled, graph->intersection_count);
+        handled[current_index] = true;
+
+        for (int j = 0; j < graph->intersection_count; j++) {
+            bool is_handled = !*(handled+j);
+            bool is_possible = *(shortest_distances+current_index) != -1;
+
+            bool is_there_edge = false;
+            int edge_weight = 0;
+            for (int k = 0; k < getIntersectionByIndex(graph, current_index)->edge_count; k++)
+            {
+                if (*(getIntersectionByIndex(graph, current_index)->edge_destination+k) == getIntersectionByIndex(graph, j)->name) {
+                    is_there_edge = true;
+                    edge_weight = *(getIntersectionByIndex(graph, current_index)->edge_weight+k);
+                }
+            }
+
+            bool is_shorter = *(shortest_distances+current_index) + edge_weight < *(shortest_distances+j);
+            
+            // there is an edge from u to v, and total
+            // weight of path from src to  v through u is
+            // smaller than current value of dist[v]
+            if (is_handled && is_possible && is_there_edge && is_shorter) {
+                *(shortest_distances+j) = *(shortest_distances+current_index) + edge_weight;
+            }
+        }
+    }
+
+    return *(shortest_distances+getIntersectionIndex(graph, end));
 }
 
 inline void swap(int* path, int a, int b)
@@ -183,5 +260,29 @@ int shortestPathMidpoints(Graph* graph) {
 }
 
 void main() {
-    
+    Graph* graph;
+    char input;
+
+    while (scanf("%c", &input) != 0) {
+        if (input == 'A') {
+            graph = initGraph();
+        }
+        else if (input == 'B') {
+            addIntersection(graph);
+        }
+        else if (input == 'D') {
+            deleteIntersection(graph);
+        }
+        else if (input == 'S') {
+            int start, end;
+            scanf("%d", &start);
+            scanf("%d", &end);
+            int ret = shortestRoute(graph, start, end);
+            printf("%d\n", ret);
+        }
+        else if (input == 'T') {
+            int ret = shortestPathMidpoints(graph);
+            printf("%d\n", ret);
+        }
+    }
 }
