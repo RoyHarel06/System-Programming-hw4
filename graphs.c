@@ -302,6 +302,8 @@ int main() {
         }
         else
             break;
+
+        input = 'f';
     }
 
     return 0;
