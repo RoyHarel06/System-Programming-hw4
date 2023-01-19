@@ -248,6 +248,8 @@ int main() {
     Graph* graph;
     char input;
 
+    bool first = true;
+
     while (scanf("%c", &input) != 0) {
         if (input == 'A') {
             graph = malloc(sizeof(Graph));
@@ -282,11 +284,21 @@ int main() {
             scanf("%d", &start);
             scanf("%d", &end);
             int ret = shortestRoute(graph, start, end);
-            printf("Dijsktra shortest path: %d\n", ret);
+
+            if (first) 
+                first = false;
+            else
+                printf("\n");
+            printf("Dijsktra shortest path: %d ", ret);
         }
         else if (input == 'T') {
             int ret = shortestPathMidpoints(graph);
-            printf("TSP shortest path: %d\n", ret);
+
+            if (first) 
+                first = false;
+            else
+                printf("\n");
+            printf("TSP shortest path: %d ", ret);
         }
         else
             break;
